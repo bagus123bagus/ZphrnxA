@@ -1,53 +1,9 @@
-const fetch = require('node-fetch');
-
-module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
-
-  try {
-    const { messages } = req.body;
-    
-    // TEST API KEY DULU
-    console.log('API Key:', process.env.groq_api_key ? 'ADA' : 'TIDAK ADA');
-    
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.groq_api_key}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
-        messages: messages,
-        temperature: 0.7,
-        max_tokens: 1000,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.status}`);
-    }
-
-    const data = await response.json();
-    res.status(200).json(data);
-
-  } catch (error) {
-    console.error('ERROR:', error.message);
-    
-    // FALLBACK YANG BENERAN BISA JAWAB APA AJA
-    const lastMessage = req.body.messages[req.body.messages.length - 1]?.content || '';
-    let fallbackResponse = `I understand you're asking about: "${lastMessage}". As ZephyrinxAI, I'm designed to provide intelligent and helpful responses on any topic. Could you tell me more about what you'd like to discuss?`;
-    
-    res.status(200).json({
-      choices: [{
-        message: { 
-          content: fallbackResponse
-        }
-      }]
-    });
+{
+  "name": "zephyrinx-ai",
+  "dependencies": {
+    "node-fetch": "^3.3.2"
+  },
+  "engines": {
+    "node": "20.x"
   }
-};
+}
