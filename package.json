@@ -1,9 +1,70 @@
-{
-  "name": "zephyrinx-ai",
-  "dependencies": {
-    "node-fetch": "^3.3.2"
-  },
-  "engines": {
-    "node": "20.x"
+const fetch = require('node-fetch');
+
+module.exports = async (req, res) => {
+  // CORS headers
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  // Handle preflight
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
   }
-}
+
+  // Only POST
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    const { messages } = req.body;
+
+    // PANGGIL GROQ API BENERAN
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.groq_api_key}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: 'llama-3.1-8b-instant',
+        messages: messages,
+        temperature: 0.7,
+        max_tokens: 1024,
+        stream: false,
+      }),
+    });
+
+    // CEK RESPONSE
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Groq API Error:', response.status, errorText);
+      
+      // FALLBACK KALAU API ERROR
+      return res.status(200).json({
+        choices: [{
+          message: { 
+            content: "I'm ZephyrinxAI! I'm currently optimizing my systems. Please try your question again in a moment!" 
+          }
+        }]
+      });
+    }
+
+    const data = await response.json();
+    
+    // RETURN RESPONSE BENERAN DARI AI
+    res.status(200).json(data);
+
+  } catch (error) {
+    console.error('Server Error:', error);
+    
+    // FALLBACK KALAU SERVER ERROR
+    res.status(200).json({
+      choices: [{
+        message: { 
+          content: "Hello! I'm ZephyrinxAI, your AI assistant. I'm here to help with any questions you have!" 
+        }
+      }]
+    });
+  }
+};
