@@ -11,10 +11,18 @@ module.exports = async (req, res) => {
   try {
     const { messages } = req.body;
     
+    // DEBUG: CEK API KEY ADA ATAU ENGGA
+    const apiKey = process.env.groq_api_key;
+    console.log('API Key exists:', !!apiKey);
+    
+    if (!apiKey) {
+      throw new Error('API key not found in environment variables');
+    }
+
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.groq_api_key}`,
+        'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -33,12 +41,11 @@ module.exports = async (req, res) => {
     res.status(200).json(data);
 
   } catch (error) {
-    // FALLBACK RESPONSE
-    const lastMessage = req.body?.messages?.[req.body.messages.length - 1]?.content || '';
+    console.error('ERROR:', error.message);
     res.status(200).json({
       choices: [{
         message: { 
-          content: `I understand you're asking about "${lastMessage}". As ZephyrinxAI, I'm here to help! What would you like to know more about?`
+          content: `DEBUG: ${error.message} - Please check Vercel environment variables!`
         }
       }]
     });
