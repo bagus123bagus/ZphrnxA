@@ -1,0 +1,14 @@
+{
+  "name": "zephyrinx-ai",
+  "version": "1.0.0",
+  "description": "Zephyrinx AI Chatbot",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}

@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zephyrinx AI</title>
+    <link rel="icon" href="logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a6cf7;
+            --secondary-color: #3b5be3;
+            --accent-color: #ff6584;
+            --dark-color: #2d3748;
+            --light-color: #f7fafc;
+            --gray-color: #a0aec0;
+            --success-color: #48bb78;
+            --bg-color: #0f172a;
+            --text-color: #f1f5f9;
+            --card-bg: #1e293b;
+            --chat-bg: #1a1a1acc;
+            --message-bg: #334155;
+            --user-message-bg: #4a6cf7;
+            --input-bg: #1e293b;
+            --border-color: #334155;
+            --footer-bg: #0f172a;
+            --footer-text: #f1f5f9;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            width: 100%;
+        }
+
+        /* Stars Animation */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background-color: white;
+            border-radius: 50%;
+            animation: twinkle linear infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            position: relative;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        @media (max-width: 576px) {
+            header {
+                justify-content: center;
+                gap: 10px;
+            }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+
+        .logo-img {
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+
+        .logo:hover .logo-img {
+            transform: scale(1.1);
+        }
+
+        .logo h1 {
+            font-size: clamp(1.6rem, 4vw, 2rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--text-color), var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo h1 span {
+            color: var(--primary-color);
+            -webkit-text-fill-color: var(--primary-color);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: clamp(15px, 2vw, 35px);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text-color);
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+            font-size: clamp(0.95rem, 3vw, 1.05rem);
+            white-space: nowrap;
+            padding: 8px 0;
+        }
+
+        nav a:hover {
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+
+        nav a.active {
+            color: var(--primary-color);
+        }
+
+        nav a.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px;
+            animation: underlineGrow 0.3s ease-out;
+        }
+
+        @keyframes underlineGrow {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: clamp(0.9rem, 2.5vw, 1rem);
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            box-shadow: 0 4px 15px rgba(74, 108, 247, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(74, 108, 247, 0.4);
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 25px;
+            padding: 30px 0 40px;
+            position: relative;
+            text-align: center;
+            min-height: 60vh;
+        }
+
+        @media (min-width: 768px) {
+            .hero {
+                gap: 35px;
+                padding: 40px 0 50px;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .hero {
+                flex-direction: row;
+                padding: 50px 0 60px;
+                gap: 50px;
+                text-align: left;
+                min-height: 60vh;
+            }
+        }
+
+        .hero-text {
+            flex: 1;
+            width: 100%;
+            animation: fadeInUp 0.8s ease-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @media (min-width: 992px) {
+            .hero-text {
+                align-items: flex-start;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hero-text h2 {
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            background: linear-gradient(135deg, var(--text-color), var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            width: 100%;
+        }
+
+        @media (min-width: 992px) {
+            .hero-text h2 {
+                text-align: left;
+            }
+        }
+
+        .hero-text h2 span {
+            color: var(--primary-color);
+            -webkit-text-fill-color: var(--primary-color);
+            position: relative;
+            display: inline-block;
+        }
+
+        .hero-text h2 span::after {
+            content: '';
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, rgba(74, 108, 247, 0.3), rgba(59, 91, 227, 0.3));
+            z-index: -1;
+            border-radius: 4px;
+            animation: highlightPulse 2s infinite;
+        }
+
+        @keyframes highlightPulse {
+            0% { opacity: 0.3; }
+            50% { opacity: 0.7; }
+            100% { opacity: 0.3; }
+        }
+
+        .hero-text p {
+            font-size: clamp(0.95rem, 3vw, 1.1rem);
+            color: var(--gray-color);
+            margin-bottom: 15px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+            text-align: center;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        @media (min-width: 992px) {
+            .hero-text p {
+                text-align: left;
+            }
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+            width: 100%;
+        }
+
+        @media (min-width: 992px) {
+            .hero-buttons {
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+                gap: 15px;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 280px;
+            }
+        }
+
+        /* Chat Widget */
+        .chat-widget {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 420px;
+            height: 580px;
+            background: var(--chat-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            overflow: hidden;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            transform: translateY(20px) scale(0.95);
+            opacity: 0;
+            transition: all 0.3s ease-out;
+            cursor: move;
+        }
+
+        .chat-widget.active {
+            display: flex;
+            transform: translateY(0) scale(1);
+            opacity: 1;
+            animation: chatSlideUp 0.4s ease-out;
+        }
+
+        .chat-widget.dragging {
+            cursor: grabbing;
+            user-select: none;
+        }
+
+        @keyframes chatSlideUp {
+            from {
+                transform: translateY(20px) scale(0.95);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .chat-header {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            cursor: move;
+            user-select: none;
+        }
+
+        .chat-header:active {
+            cursor: grabbing;
+        }
+
+        .chat-avatar {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .chat-avatar img {
+            width: 26px;
+            height: 26px;
+            object-fit: contain;
+        }
+
+        .chat-info {
+            flex: 1;
+        }
+
+        .chat-info h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 3px;
+        }
+
+        .chat-info p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .chat-controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        .chat-controls i {
+            cursor: pointer;
+            opacity: 0.8;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+            padding: 5px;
+        }
+
+        .chat-controls i:hover {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: var(--chat-bg);
+            scroll-behavior: smooth;
+            cursor: default;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 20px;
+            animation: messageFadeIn 0.4s ease-out;
+        }
+
+        @keyframes messageFadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+            font-size: 0.85rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .message-avatar img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+        }
+
+        .message-content {
+            max-width: 75%;
+        }
+
+        .message-content p {
+            background: var(--message-bg);
+            padding: 14px 18px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            word-break: break-word;
+            animation: messagePop 0.3s ease-out;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes messagePop {
+            0% { transform: scale(0.9); opacity: 0; }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .message-time {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--gray-color);
+            margin-top: 6px;
+            text-align: right;
+        }
+
+        .bot-message .message-content p {
+            border-bottom-left-radius: 5px;
+            background: var(--message-bg);
+        }
+
+        .user-message {
+            justify-content: flex-end;
+        }
+
+        .user-message .message-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .user-message .message-content p {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-bottom-right-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .user-message .message-time {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .typing-indicator {
+            display: flex;
+            padding: 14px 18px;
+            background: var(--message-bg);
+            border-radius: 20px;
+            width: fit-content;
+            margin-bottom: 20px;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .typing-indicator span {
+            height: 9px;
+            width: 9px;
+            background: var(--gray-color);
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 3px;
+            opacity: 0.4;
+        }
+
+        .typing-indicator span:nth-child(1) {
+            animation: typing 1.2s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation: typing 1.2s infinite 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation: typing 1.2s infinite 0.4s;
+        }
+
+        @keyframes typing {
+            0% { opacity: 0.4; transform: translateY(0); }
+            50% { opacity: 1; transform: translateY(-3px); }
+            100% { opacity: 0.4; transform: translateY(0); }
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 20px;
+            background: var(--card-bg);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+            gap: 12px;
+            cursor: default;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 14px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 25px;
+            outline: none;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            background: var(--input-bg);
+            color: var(--text-color);
+            cursor: text;
+        }
+
+        .chat-input input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.25);
+        }
+
+        .chat-input button {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(74, 108, 247, 0.3);
+        }
+
+        .chat-input button:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 18px rgba(74, 108, 247, 0.4);
+        }
+
+        .chat-input button:disabled {
+            background: var(--gray-color);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Chat Toggle Button */
+        .chat-toggle {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.7rem;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(74, 108, 247, 0.5);
+            z-index: 999;
+            transition: all 0.3s;
+            border: none;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .chat-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 15px 40px rgba(74, 108, 247, 0.7);
+            animation: none;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 40px 0;
+            text-align: center;
+        }
+
+        @media (min-width: 768px) {
+            .features {
+                padding: 60px 0;
+            }
+        }
+
+        .features h2 {
+            font-size: clamp(1.6rem, 4vw, 2.5rem);
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, var(--text-color), var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            padding: 0 15px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        @media (min-width: 576px) {
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 30px;
+                padding: 0 20px;
+            }
+        }
+
+        @media (min-width: 992px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 35px;
+                padding: 0;
+            }
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, var(--card-bg), #1e2a47);
+            padding: 25px 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, rgba(74, 108, 247, 0.1), rgba(59, 91, 227, 0.1));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            border: 2px solid rgba(74, 108, 247, 0.2);
+        }
+
+        .feature-icon i {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-card p {
+            color: var(--gray-color);
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            background: linear-gradient(135deg, var(--footer-bg), #0d1424);
+            color: var(--footer-text);
+            padding: 40px 0 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+            padding: 0 15px;
+        }
+
+        @media (min-width: 576px) {
+            .footer-content {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 40px;
+                padding: 0 20px;
+            }
+        }
+
+        .footer-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .footer-logo img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .footer-logo-text h3 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, var(--text-color), var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-links-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .footer-links h4 {
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+        }
+
+        .footer-links ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-links a {
+            color: var(--footer-text);
+            text-decoration: none;
+            opacity: 0.8;
+            transition: all 0.3s;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+            color: var(--primary-color);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding: 30px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Sections */
+        section {
+            display: none;
+            padding: 40px 0;
+        }
+
+        section.active {
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .chat-widget {
+                width: 92vw;
+                height: 65vh;
+                right: 4vw;
+                bottom: 20px;
+                left: 4vw;
+            }
+            
+            .chat-toggle {
+                right: 20px;
+                bottom: 20px;
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <img src="logo.png" alt="Zephyrinx Logo" class="logo-img">
+                <h1>Zephyr<span>inx</span></h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="nav-link active" data-section="home">Home</a></li>
+                    <li><a href="#" class="nav-link" data-section="features">Features</a></li>
+                    <li><a href="#" class="nav-link" data-section="about">About</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <main>
+            <section id="home" class="active">
+                <div class="hero">
+                    <div class="hero-text">
+                        <h2>Advanced Conversational AI <span>for Everyone</span></h2>
+                        <p>Experience the future of communication with our cutting-edge AI chatbot technology, designed to deliver seamless, natural, and intelligent interactions.</p>
+                        <p>ZephyrinxAI empowers individuals, businesses, and organizations to connect effortlessly, enhance productivity, and unlock new possibilities through advanced conversational intelligence.</p>
+                        <p>Developed & Created by <b>GishhGNTG</b>, this platform represents our commitment to innovation, reliability, and user-centered design in the field of artificial intelligence.</p>
+                        
+                        <div class="hero-buttons">
+                            <button class="btn btn-primary" id="start-chatting">
+                                <i class="fas fa-comments"></i>
+                                Start Chatting
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="features">
+                <div class="features">
+                    <h2>Why Choose <span>ZephyrinxAI</span></h2>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h3>Advanced AI</h3>
+                            <p>Powered by cutting-edge natural language processing for human-like conversations and intelligent responses.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-history"></i>
+                            </div>
+                            <h3>Context Memory</h3>
+                            <p>Remembers previous conversations across sessions for continuous, meaningful interactions.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-globe"></i>
+                            </div>
+                            <h3>Multilingual</h3>
+                            <p>Communicates fluently in multiple languages with accurate translations and cultural understanding.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <h3>Lightning Fast</h3>
+                            <p>Instant responses with minimal latency for natural-feeling, real-time conversations.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h3>Privacy Focused</h3>
+                            <p>End-to-end encryption ensures your conversations remain completely private and secure.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <h3>Customizable</h3>
+                            <p>Personalize your AI's personality, tone, and response style to perfectly fit your needs.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="about">
+                <div class="about">
+                    <h2>About <span>ZephyrinxAI</span></h2>
+                    <div class="about-grid">
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-bullseye"></i>
+                            </div>
+                            <h3>Our Mission</h3>
+                            <p>To create AI that enhances human potential through natural, intuitive, and meaningful interactions that feel genuinely human.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-user-tie"></i>
+                            </div>
+                            <h3>Creator & Developer</h3>
+                            <p><b>GishhGNTG</b> - Passionate about creating innovative AI solutions that make technology more accessible and human-centered.</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">
+                                <i class="fas fa-microchip"></i>
+                            </div>
+                            <h3>Technology</h3>
+                            <p>Built on advanced transformer architecture with proprietary fine-tuning for exceptional conversational capabilities.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">
+                        <img src="logo.png" alt="Zephyrinx Logo">
+                        <div class="footer-logo-text">
+                            <h3>Zephyr<span>inx</span></h3>
+                            <p>The future of conversational AI</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="footer-links-section">
+                    <div class="footer-links">
+                        <h4>Quick Links</h4>
+                        <ul>
+                            <li><a href="#" class="footer-nav-link" data-section="home">Home</a></li>
+                            <li><a href="#" class="footer-nav-link" data-section="features">Features</a></li>
+                            <li><a href="#" class="footer-nav-link" data-section="about">About</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2023 ZephyrinxAI. All rights reserved. | Crafted with ❤️ by GishhGNTG</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Floating Chat Widget -->
+    <div class="chat-toggle" id="chat-toggle">
+        <i class="fas fa-comments"></i>
+    </div>
+
+    <div class="chat-widget" id="chat-widget">
+        <div class="chat-header" id="chat-header">
+            <div class="chat-avatar">
+                <img src="logo.png" alt="AI Avatar">
+            </div>
+            <div class="chat-info">
+                <h3>ZephyrinxAI</h3>
+                <p>Online • Ready to help</p>
+            </div>
+            <div class="chat-controls">
+                <i class="fas fa-minus" id="minimize-chat"></i>
+                <i class="fas fa-times" id="close-chat"></i>
+            </div>
+        </div>
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot-message">
+                <div class="message-avatar">
+                    <img src="logo.png" alt="AI Avatar">
+                </div>
+                <div class="message-content">
+                    <p>Hello! I'm ZephyrinxAI, your intelligent assistant. How can I help you today?</p>
+                    <span class="message-time">Just now</span>
+                </div>
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="user-input" placeholder="Type your message here...">
+            <button id="send-button"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // API Configuration - AMAN UNTUK GITHUB
+            const API_URL = '/api/chat';
+
+            // Create stars
+            function createStars() {
+                const starsContainer = document.getElementById('stars');
+                const starsCount = 150;
+                
+                for (let i = 0; i < starsCount; i++) {
+                    const star = document.createElement('div');
+                    star.classList.add('star');
+                    
+                    const size = Math.random() * 3;
+                    const posX = Math.random() * 100;
+                    const posY = Math.random() * 100;
+                    const duration = 2 + Math.random() * 8;
+                    const delay = Math.random() * 5;
+                    
+                    star.style.width = `${size}px`;
+                    star.style.height = `${size}px`;
+                    star.style.left = `${posX}%`;
+                    star.style.top = `${posY}%`;
+                    star.style.animationDuration = `${duration}s`;
+                    star.style.animationDelay = `${delay}s`;
+                    
+                    starsContainer.appendChild(star);
+                }
+            }
+            
+            createStars();
+            
+            // DOM Elements
+            const chatWidget = document.getElementById('chat-widget');
+            const chatMessages = document.getElementById('chat-messages');
+            const userInput = document.getElementById('user-input');
+            const sendButton = document.getElementById('send-button');
+            const startChattingBtn = document.getElementById('start-chatting');
+            const chatToggle = document.getElementById('chat-toggle');
+            const minimizeChat = document.getElementById('minimize-chat');
+            const closeChat = document.getElementById('close-chat');
+            const chatHeader = document.getElementById('chat-header');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const footerNavLinks = document.querySelectorAll('.footer-nav-link');
+            const sections = document.querySelectorAll('section');
+            
+            // Chat state
+            let conversationHistory = [
+                { role: 'assistant', content: "Hello! I'm ZephyrinxAI, your intelligent assistant. How can I help you today?" }
+            ];
+
+            // Dragging functionality
+            let isDragging = false;
+            let currentX, currentY, initialX, initialY, xOffset = 0, yOffset = 0;
+
+            function startDrag(e) {
+                if (e.target.closest('.chat-controls')) return;
+                
+                initialX = e.clientX - xOffset;
+                initialY = e.clientY - yOffset;
+                
+                if (e.target === chatHeader || e.target.closest('.chat-header')) {
+                    isDragging = true;
+                    chatWidget.classList.add('dragging');
+                }
+            }
+
+            function drag(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                    currentX = e.clientX - initialX;
+                    currentY = e.clientY - initialY;
+
+                    xOffset = currentX;
+                    yOffset = currentY;
+
+                    setTranslate(currentX, currentY, chatWidget);
+                }
+            }
+
+            function stopDrag() {
+                initialX = currentX;
+                initialY = currentY;
+                isDragging = false;
+                chatWidget.classList.remove('dragging');
+            }
+
+            function setTranslate(xPos, yPos, el) {
+                el.style.transform = `translate3d(${xPos}px, ${yPos}px, 0)`;
+            }
+
+            // Event listeners for dragging
+            chatHeader.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+
+            // Function to add message to chat
+            function addMessage(text, isUser) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+                
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'message-avatar';
+                
+                if (isUser) {
+                    avatarDiv.innerHTML = '<i class="fas fa-user"></i>';
+                } else {
+                    avatarDiv.innerHTML = '<img src="logo.png" alt="AI Avatar">';
+                }
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                
+                const messageText = document.createElement('p');
+                messageText.textContent = text;
+                
+                const now = new Date();
+                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const timeSpan = document.createElement('span');
+                timeSpan.className = 'message-time';
+                timeSpan.textContent = timeString;
+                
+                contentDiv.appendChild(messageText);
+                contentDiv.appendChild(timeSpan);
+                
+                messageDiv.appendChild(avatarDiv);
+                messageDiv.appendChild(contentDiv);
+                
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                conversationHistory.push({
+                    role: isUser ? 'user' : 'assistant',
+                    content: text
+                });
+            }
+            
+            // Function to show typing indicator
+            function showTypingIndicator() {
+                const typingDiv = document.createElement('div');
+                typingDiv.className = 'message bot-message';
+                
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'message-avatar';
+                avatarDiv.innerHTML = '<img src="logo.png" alt="AI Avatar">';
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                
+                const typingIndicator = document.createElement('div');
+                typingIndicator.className = 'typing-indicator';
+                typingIndicator.innerHTML = '<span></span><span></span><span></span>';
+                
+                contentDiv.appendChild(typingIndicator);
+                typingDiv.appendChild(avatarDiv);
+                typingDiv.appendChild(contentDiv);
+                
+                chatMessages.appendChild(typingDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                return typingDiv;
+            }
+            
+            // Function to call API
+            async function callAPI() {
+                try {
+                    sendButton.innerHTML = '<div class="spinner"></div>';
+                    sendButton.disabled = true;
+                    
+                    const response = await fetch(API_URL, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            messages: conversationHistory
+                        }),
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('API error: ' + response.status);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                    sendButton.disabled = false;
+                    
+                    if (data.choices && data.choices[0] && data.choices[0].message) {
+                        return data.choices[0].message.content;
+                    } else {
+                        throw new Error('Invalid response format');
+                    }
+                    
+                } catch (error) {
+                    sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                    sendButton.disabled = false;
+                    throw error;
+                }
+            }
+            
+            // Function to handle bot response
+            async function botRespond(userMessage) {
+                const typingIndicator = showTypingIndicator();
+                
+                try {
+                    const response = await callAPI();
+                    
+                    chatMessages.removeChild(typingIndicator);
+                    addMessage(response, false);
+                    
+                } catch (error) {
+                    console.error('Error generating response:', error);
+                    chatMessages.removeChild(typingIndicator);
+                    
+                    let errorMessage = "I apologize for the inconvenience. Please try again in a moment.";
+                    
+                    if (error.message.includes('API error: 429')) {
+                        errorMessage = "The AI service is currently experiencing high demand. Please wait a moment and try again.";
+                    } else if (error.message.includes('Failed to fetch')) {
+                        errorMessage = "I'm having connection issues. Please check your internet connection and try again.";
+                    }
+                    
+                    addMessage(errorMessage, false);
+                }
+            }
+            
+            // Event listeners
+            sendButton.addEventListener('click', function() {
+                const message = userInput.value.trim();
+                if (message) {
+                    addMessage(message, true);
+                    userInput.value = '';
+                    botRespond(message);
+                }
+            });
+            
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const message = userInput.value.trim();
+                    if (message) {
+                        addMessage(message, true);
+                        userInput.value = '';
+                        botRespond(message);
+                    }
+                }
+            });
+            
+            startChattingBtn.addEventListener('click', function() {
+                chatWidget.classList.add('active');
+                userInput.focus();
+            });
+            
+            chatToggle.addEventListener('click', function() {
+                chatWidget.classList.toggle('active');
+                if (chatWidget.classList.contains('active')) {
+                    userInput.focus();
+                }
+            });
+            
+            minimizeChat.addEventListener('click', function(e) {
+                e.stopPropagation();
+                chatWidget.classList.remove('active');
+            });
+            
+            closeChat.addEventListener('click', function(e) {
+                e.stopPropagation();
+                chatWidget.classList.remove('active');
+            });
+            
+            // Navigation functionality
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    navLinks.forEach(navLink => navLink.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const sectionId = this.getAttribute('data-section');
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === sectionId) {
+                            section.classList.add('active');
+                        }
+                    });
+                    
+                    window.scrollTo(0, 0);
+                });
+            });
+            
+            footerNavLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const sectionId = this.getAttribute('data-section');
+                    navLinks.forEach(navLink => navLink.classList.remove('active'));
+                    document.querySelector(`.nav-link[data-section="${sectionId}"]`).classList.add('active');
+                    
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === sectionId) {
+                            section.classList.add('active');
+                        }
+                    });
+                    
+                    window.scrollTo(0, 0);
+                });
+            });
+
+            // Touch events for mobile
+            chatHeader.addEventListener('touchstart', (e) => {
+                const touch = e.touches[0];
+                startDrag(touch);
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                const touch = e.touches[0];
+                drag(touch);
+            });
+
+            document.addEventListener('touchend', stopDrag);
+        });
+    </script>
+</body>
+</html>
